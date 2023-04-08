@@ -7,9 +7,13 @@ import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import { queryCollections } from '../service/collection';
 import { mintNFT } from '../toolkit/transaction';
+import { CollectionStatusMap } from '../config/constant';
 
 const isShowMintBtn = (collection) => {
-  const { publicStartTime, publicEndTime } = collection;
+  const { publicStartTime, publicEndTime, status } = collection;
+  if (status === CollectionStatusMap?.Draft) {
+    return 'Status: Draft';
+  }
   const now = Date.now();
   if (now >= publicStartTime && now <= publicEndTime) {
     return 'minting';
