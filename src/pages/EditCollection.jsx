@@ -20,6 +20,7 @@ import { queryCollections, updateCollection } from '../service/collection';
 import { CollectionStatusMap, CollectionStatus } from '../config/constant';
 import UploadArtwork from '../components/UploadArtwork';
 import UploadBanner from '../components/UploadBanner';
+import { creatContractAddress } from '../toolkit/transaction';
 
 export default function EditCollection() {
   const [imageUrl, setImageUrl] = useState('');
@@ -73,22 +74,31 @@ export default function EditCollection() {
         symbol, description, collectionName, royalties, id,
         publicStartTime, publicEndTime, price, status,
       } = formik?.values || {};
-      const data = {
-        id,
-        symbol,
-        description,
-        collectionName,
-        walletAddress: account?.address,
-        royalties: royalties / 100,
-        publicStartTime,
-        publicEndTime,
-        publicPrice: price,
-        bannerUrl: imageUrl,
-        imgUrl: artImageUrl,
-        userId: userInfo?.id,
-        status,
-      };
+      let contractAddress = '';
       try {
+        if (status === CollectionStatusMap?.Deployed) {
+          contractAddress = await creatContractAddress();
+          if (!contractAddress) {
+            toast.error('Contract creation failed');
+            return;
+          }
+        }
+        const data = {
+          id,
+          symbol,
+          description,
+          collectionName,
+          walletAddress: account?.address,
+          royalties: royalties / 100,
+          publicStartTime,
+          publicEndTime,
+          publicPrice: price,
+          bannerUrl: imageUrl,
+          imgUrl: artImageUrl,
+          userId: userInfo?.id,
+          status,
+          contractAddress,
+        };
         const res = await updateCollection(data);
         if (res === 'success') {
           toast.success('Update collection successfully');
