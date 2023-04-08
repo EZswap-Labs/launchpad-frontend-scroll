@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import {
-  Grid, Container, Typography, Box,
+  Grid, Container, Typography, Box, TextField, Button,
 } from '@mui/material';
+import { useAccount } from 'wagmi';
+import { toast } from 'react-toastify';
 import { queryCollections } from '../service/collection';
+import { mintNFT } from '../toolkit/transaction';
 
 export default function CollectionInfo() {
   const [collection, setCollection] = useState({});
+  const [mintCount, setMintCount] = useState(0);
+  const account = useAccount();
+
   useEffect(() => {
     const cid = window?.location?.hash?.split('?cid=')?.[1];
     if (cid) {
@@ -54,16 +60,27 @@ export default function CollectionInfo() {
                 my: 2,
               }}
               >
-                <Box
-                  component="img"
-                  src={collection?.userAccount?.userLogo}
-                  alt="test"
-                  sx={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                  }}
-                />
+                {collection?.userAccount?.userLogo ? (
+                  <Box
+                    component="img"
+                    src={collection?.userAccount?.userLogo}
+                    alt="test"
+                    sx={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: '#eee',
+                    }}
+                  />
+                )}
                 <Typography
                   variant="body1"
                   component="p"
@@ -76,12 +93,58 @@ export default function CollectionInfo() {
                   {collection?.userAccount?.userName || 'userName'}
                 </Typography>
               </Box>
-              <Typography variant="body1" component="p" gutterBottom sx={{ textAlign: 'left' }}>
+              {/* <Typography variant="body1" component="p" gutterBottom sx={{ textAlign: 'left' }}>
                 9999 Minted
-              </Typography>
+              </Typography> */}
               <Typography variant="body1" component="p" gutterBottom sx={{ textAlign: 'left' }}>
                 {collection?.description}
               </Typography>
+              <Box sx={{
+                mt: 4,
+              }}
+              >
+                <TextField
+                  label="Mint Count"
+                  value={mintCount}
+                  onChange={(e) => {
+                    setMintCount(e?.target?.value);
+                  }}
+                  type="number"
+                  variant="outlined"
+                  sx={{ mr: 2, width: 200 }}
+                />
+                <Button
+                  variant="contained"
+                  sx={{
+                    background: '#fff',
+                    fontFamily: 'Georgia',
+                    color: '#000',
+                    mt: 2,
+                    '&:hover': {
+                      background: '#fff',
+                    },
+                  }}
+                  onClick={() => {
+                    console.log('collection', collection);
+                    if (mintCount <= 0) {
+                      toast.warning('please fill mint count');
+                      return;
+                    }
+                    if (!collection?.contractAddress) {
+                      toast.warning('contractAddress Not yet deployed');
+                      return;
+                    }
+                    mintNFT({
+                      erc1155Address: collection?.contractAddress,
+                      userAddress: account?.address,
+                      count: mintCount,
+                      tokenId: 1,
+                    });
+                  }}
+                >
+                  Mint
+                </Button>
+              </Box>
             </Box>
           </Grid>
         </Grid>

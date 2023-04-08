@@ -82,7 +82,7 @@ export default function EditCollection() {
         royalties: royalties / 100,
         publicStartTime,
         publicEndTime,
-        price,
+        publicPrice: price,
         bannerUrl: imageUrl,
         imgUrl: artImageUrl,
         userId: userInfo?.id,
@@ -107,11 +107,10 @@ export default function EditCollection() {
     }
   }, [account?.address]);
   const fillback = (formData) => {
-    console.log(formData);
     formik.setValues({
       ...formData?.[0],
       royalties: (formData?.[0]?.royalties || 0) * 100,
-      price: 1,
+      price: (formData?.[0]?.publicPrice || 0),
     });
     setImageUrl(formData?.[0]?.bannerUrl);
     setArtImageUrl(formData?.[0]?.imgUrl);

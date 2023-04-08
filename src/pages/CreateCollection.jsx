@@ -21,6 +21,7 @@ import { createCollection } from '../service/collection';
 import { CollectionStatusMap } from '../config/constant';
 import UploadBanner from '../components/UploadBanner';
 import UploadArtwork from '../components/UploadArtwork';
+import { creatContractAddress } from '../toolkit/transaction';
 
 export default function CreateCollection() {
   const [imageUrl, setImageUrl] = useState('');
@@ -82,21 +83,30 @@ export default function CreateCollection() {
         symbol, description, collectionName, royalties,
         publicStartTime, publicEndTime, price, status,
       } = formik?.values || {};
-      const data = {
-        symbol,
-        description,
-        collectionName,
-        walletAddress: account?.address,
-        royalties: royalties / 100,
-        publicStartTime,
-        publicEndTime,
-        price,
-        bannerUrl: imageUrl,
-        imgUrl: artImageUrl,
-        userId: userInfo?.id,
-        status,
-      };
+      let contractAddress = '';
       try {
+        if (status === CollectionStatusMap?.Deployed) {
+          contractAddress = await creatContractAddress();
+          if (!contractAddress) {
+            toast.error('Contract creation failed');
+            return;
+          }
+        }
+        const data = {
+          symbol,
+          description,
+          collectionName,
+          walletAddress: account?.address,
+          royalties: royalties / 100,
+          publicStartTime,
+          publicEndTime,
+          publicPrice: price,
+          bannerUrl: imageUrl,
+          imgUrl: artImageUrl,
+          userId: userInfo?.id,
+          status,
+          contractAddress,
+        };
         const res = await createCollection(data);
         if (res === 'success') {
           toast.success('Create collection successfully');
