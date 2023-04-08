@@ -4,6 +4,7 @@ import {
 } from '@mui/material';
 import { useAccount } from 'wagmi';
 import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
 import { queryCollections } from '../service/collection';
 import { mintNFT } from '../toolkit/transaction';
 
@@ -14,10 +15,10 @@ const isShowMintBtn = (collection) => {
     return 'minting';
   }
   if (now < publicStartTime) {
-    return 'Start at';
+    return `Start at: ${dayjs(publicStartTime).format('lll')}`;
   }
   if (now > publicEndTime) {
-    return 'Ended';
+    return `Ended at: ${dayjs(publicEndTime).format('lll')}`;
   }
   return '';
 };
@@ -142,7 +143,6 @@ export default function CollectionInfo() {
                       },
                     }}
                     onClick={() => {
-                      console.log('collection', collection);
                       if (mintCount <= 0) {
                         toast.warning('please fill mint count');
                         return;

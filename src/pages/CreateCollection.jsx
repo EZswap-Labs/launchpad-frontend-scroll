@@ -45,7 +45,7 @@ export default function CreateCollection() {
       price: 0,
       royalties: 0,
       publicStartTime: Date.now(),
-      publicEndTime: Date.now(),
+      publicEndTime: Date.now() + (1000 * 60 * 60 * 24 * 10),
       status: CollectionStatusMap?.Draft,
     },
     validationSchema: Yup.object({
