@@ -5,7 +5,6 @@ import {
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { signIn } from '../service/account';
-import { creatContractAddress, mintNFT, getNftBalance } from '../toolkit/transaction';
 
 function Header() {
   const account = useAccount();
