@@ -86,9 +86,11 @@ export default function Signup() {
     onSubmit: async (e, { setErrors, setSubmitting }) => {
       if (!account?.address) {
         toast.error('Please connect your wallet');
+        return;
       }
       if (!imageUrl) {
         toast.error('Please upload a avatar');
+        return;
       }
       const { email, password, userName } = formik?.values || {};
       const data = {

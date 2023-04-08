@@ -7,6 +7,21 @@ import { toast } from 'react-toastify';
 import { queryCollections } from '../service/collection';
 import { mintNFT } from '../toolkit/transaction';
 
+const isShowMintBtn = (collection) => {
+  const { publicStartTime, publicEndTime } = collection;
+  const now = Date.now();
+  if (now >= publicStartTime && now <= publicEndTime) {
+    return 'minting';
+  }
+  if (now < publicStartTime) {
+    return 'Start at';
+  }
+  if (now > publicEndTime) {
+    return 'Ended';
+  }
+  return '';
+};
+
 export default function CollectionInfo() {
   const [collection, setCollection] = useState({});
   const [mintCount, setMintCount] = useState(0);
@@ -99,52 +114,65 @@ export default function CollectionInfo() {
               <Typography variant="body1" component="p" gutterBottom sx={{ textAlign: 'left' }}>
                 {collection?.description}
               </Typography>
-              <Box sx={{
-                mt: 4,
-              }}
-              >
-                <TextField
-                  label="Mint Count"
-                  value={mintCount}
-                  onChange={(e) => {
-                    setMintCount(e?.target?.value);
-                  }}
-                  type="number"
-                  variant="outlined"
-                  sx={{ mr: 2, width: 200 }}
-                />
-                <Button
-                  variant="contained"
-                  sx={{
-                    background: '#fff',
-                    fontFamily: 'Georgia',
-                    color: '#000',
-                    mt: 2,
-                    '&:hover': {
+              {isShowMintBtn(collection) === 'minting' ? (
+                <Box sx={{
+                  mt: 4,
+                }}
+                >
+                  <TextField
+                    label="Mint Count"
+                    value={mintCount}
+                    onChange={(e) => {
+                      setMintCount(e?.target?.value);
+                    }}
+                    type="number"
+                    variant="outlined"
+                    sx={{ mr: 2, width: 200 }}
+                  />
+
+                  <Button
+                    variant="contained"
+                    sx={{
                       background: '#fff',
-                    },
-                  }}
-                  onClick={() => {
-                    console.log('collection', collection);
-                    if (mintCount <= 0) {
-                      toast.warning('please fill mint count');
-                      return;
-                    }
-                    if (!collection?.contractAddress) {
-                      toast.warning('contractAddress Not yet deployed');
-                      return;
-                    }
-                    mintNFT({
-                      erc1155Address: collection?.contractAddress,
-                      userAddress: account?.address,
-                      count: mintCount,
-                      tokenId: 1,
-                    });
+                      fontFamily: 'Georgia',
+                      color: '#000',
+                      mt: 2,
+                      '&:hover': {
+                        background: '#fff',
+                      },
+                    }}
+                    onClick={() => {
+                      console.log('collection', collection);
+                      if (mintCount <= 0) {
+                        toast.warning('please fill mint count');
+                        return;
+                      }
+                      if (!collection?.contractAddress) {
+                        toast.warning('contractAddress Not yet deployed');
+                        return;
+                      }
+                      mintNFT({
+                        erc1155Address: collection?.contractAddress,
+                        userAddress: account?.address,
+                        count: mintCount,
+                        tokenId: 1,
+                      });
+                    }}
+                  >
+                    Mint
+                  </Button>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    mt: 2,
+                    fontFamily: 'Georgia',
+                    fontSize: 20,
                   }}
                 >
-                  Mint
-                </Button>
-              </Box>
+                  {isShowMintBtn(collection)}
+                </Box>
+              )}
             </Box>
           </Grid>
         </Grid>

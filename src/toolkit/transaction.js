@@ -33,6 +33,7 @@ export const mintNFT = async ({
     userAddress,
   );
   await mintTx.wait();
+  toast.success('Mint successfully');
   // return erc1155Address;
 };
 
